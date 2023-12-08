@@ -12,40 +12,42 @@ export class ArticalsController {
 
   @Post()
   @ApiCreatedResponse({ type: ArticleEntity })
-  create(@Body() createArticalDto: CreateArticalDto) {
-    return this.articalsService.create(createArticalDto);
+  async create(@Body() createArticleDto: CreateArticalDto) {
+    return new ArticleEntity(
+      await this.articalsService.create(createArticleDto),
+    );
   }
   @Get('drafts')
   @ApiOkResponse({ type: ArticleEntity, isArray: true })
-  findDrafts() {
-    return this.articalsService.findDrafts();
+  async findDrafts() {
+    const drafts = await this.articalsService.findDrafts();
+    return drafts.map((draft) => new ArticleEntity(draft));
   }
 
   @Get()
   @ApiOkResponse({ type: ArticleEntity, isArray: true })
-  findAll() {
-    return this.articalsService.findAll();
+  // findAll() {
+  //   return this.articalsService.findAll();
+  async findAll() {
+    const articles = await this.articalsService.findAll();
+    return articles.map((article) => new ArticleEntity(article));
   }
 
   @Get(':id')
   @ApiOkResponse({ type: ArticleEntity })
-  async findOne(@Param('id',ParseIntPipe) id: number) {
-    const article = await this.articalsService.findOne(id);
-    if (!article) {
-      throw new NotFoundException(`Article with ${id} does not exist.`);
-    }
-    return article;
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return new ArticleEntity(await this.articalsService.findOne(id));
   }
 
   @Patch(':id')
   @ApiOkResponse({ type: ArticleEntity })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateArticalDto: UpdateArticalDto) {
-    return this.articalsService.update(id, updateArticalDto);
+  async update(@Param('id', ParseIntPipe) id: number, @Body() updateArticalDto: UpdateArticalDto) {
+    return new ArticleEntity(await this.articalsService.update(id, updateArticalDto));
   }
 
   @Delete(':id')
   @ApiOkResponse({ type: ArticleEntity })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.articalsService.remove(id);
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    return new ArticleEntity(await this.articalsService.remove(id));
   }
 }
